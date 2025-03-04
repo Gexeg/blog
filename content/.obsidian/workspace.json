@@ -1,0 +1,186 @@
+{
+  "main": {
+    "id": "303eec6dacb97f70",
+    "type": "split",
+    "children": [
+      {
+        "id": "2fae1ce93f93371f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2c48de21181709f9",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "eb3c53386a182a73",
+    "type": "split",
+    "children": [
+      {
+        "id": "34172f1ecb6c6ba8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1e839aa8c752fd4c",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "82b13266fd768bd0",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "43a7e74f41a6068a",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "8838f9383a655d97",
+    "type": "split",
+    "children": [
+      {
+        "id": "6249603d88929c8d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c64a8505ea628906",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "posts/Размышления о типах и mypy.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Размышления о типах и mypy"
+            }
+          },
+          {
+            "id": "a2b32536535ba5ba",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "posts/Размышления о типах и mypy.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Размышления о типах и mypy"
+            }
+          },
+          {
+            "id": "e965b85ad6f5b615",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "d16de45c5763230d",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "posts/Размышления о типах и mypy.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Размышления о типах и mypy"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "2c48de21181709f9",
+  "lastOpenFiles": [
+    "notes/mypy and types.md",
+    "_index.md",
+    "notes/_index.md",
+    "about/_index.md",
+    "about.md",
+    "about/Размышления о типах и mypy.md",
+    "about",
+    "notes (Copy)/Размышления о типах и mypy.md",
+    "notes (Copy)",
+    "posts/Размышления о типах и mypy.md",
+    "notes/Размышления о типах и mypy.md",
+    "notes",
+    "posts/Размышления о типах и mypy (Copy).md",
+    "posts/my-first-post.md",
+    "Автор.md",
+    "about/about.md"
+  ]
+}

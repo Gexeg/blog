@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Posts on Контекста не завезли</title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Posts on Контекста не завезли</description>
+    <generator>Hugo -- 0.145.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 04 Mar 2025 16:42:12 +0300</lastBuildDate>
+    <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Размышления о типах и mypy</title>
+      <link>http://localhost:1313/posts/%D1%80%D0%B0%D0%B7%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE-%D1%82%D0%B8%D0%BF%D0%B0%D1%85-%D0%B8-mypy/</link>
+      <pubDate>Tue, 04 Mar 2025 16:42:12 +0300</pubDate>
+      <guid>http://localhost:1313/posts/%D1%80%D0%B0%D0%B7%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE-%D1%82%D0%B8%D0%BF%D0%B0%D1%85-%D0%B8-mypy/</guid>
+      <description>&lt;p&gt;Аннотации типов и анализатор &lt;code&gt;mypy&lt;/code&gt; уже довольно давно представлены в Python. Дальше в тексте размышления на эту тему от разработчика - питониста.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

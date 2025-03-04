@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=blog/livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Размышления о типах и mypy | Контекста не завезли</title>
+<meta name="keywords" content="python, mypy, types">
+<meta name="description" content="Аннотации типов и анализатор mypy уже довольно давно представлены в Python. Дальше в тексте размышления на эту тему от разработчика - питониста.">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/blog/notes/mypy-and-types/">
+<link crossorigin="anonymous" href="/blog/assets/css/stylesheet.45e028aa8ce0961349adf411b013ee39406be2c0bc80d4ea3fc04555f7f4611a.css" integrity="sha256-ReAoqozglhNJrfQRsBPuOUBr4sC8gNTqP8BFVff0YRo=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/blog/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/blog/notes/mypy-and-types/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/blog/" accesskey="h" title="Контекста не завезли (Alt + H)">Контекста не завезли</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/blog/notes/" title="Заметки">
+                    <span>Заметки</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/blog/about/" title="Автор">
+                    <span>Автор</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Размышления о типах и mypy
+    </h1>
+    <div class="post-meta"><span title='2025-03-04 16:42:12 +0300 MSK'>March 4, 2025</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p>Аннотации типов и анализатор <code>mypy</code> уже довольно давно представлены в Python. Дальше в тексте размышления на эту тему от разработчика - питониста.</p>
+<p>Если коротко и в идеальном мире, то проектируя типы в приложении заранее мы страхуем себя от будущих рисков и снижаем когнитивную сложность для дальнейшего поддержания кода. На практике и при недостаточных данных это часто может увеличивать срок разработки и увеличивать согласование.</p>
+<p>Давайте немного на примерах, пусть и синтетических, где это может быть полезно:</p>
+<h4 id="задача">Задача<a hidden class="anchor" aria-hidden="true" href="#задача">#</a></h4>
+<p>У нас есть некая система работающая с деньгами и например активами. В ней присутствует несколько валют, пусть это будут рубли, евро и доллары. Стоимость активов может быть в разных валютах а пользователи хотят иметь возможность видеть баланс в одной.</p>
+<h4 id="может-быть-хватит-базы--int-float--decimal">Может быть хватит базы?  <code>int</code>\ <code>float</code> \ <code>Decimal</code><a hidden class="anchor" aria-hidden="true" href="#может-быть-хватит-базы--int-float--decimal">#</a></h4>
+<p>Стандартные типы на первый взгляд уже вполне подходят для операций. В них уже реализованы все арифметические операции.</p>
+<p>Но если начать делать первые шаги, то открывается куча проблем:</p>
+<ul>
+<li><code>float</code> не обладает нужной точность, но мы совсем немного запаримся и  можем импортировать Decimal. Но тут может отпасть код, если мы где-то использовали josn.dumps() в общем чуть-чуть но уже надо будет думать.</li>
+<li>Это числовые типы данных и они не несут никакой дополнительной информации о валюте. Мы можем складывать разные валюты, оперировать не представленными в действительности долями вроде тысячных копеек (хотя тут зависит от того, какие деньги мы моделируем. В наличном мире таких сумм нет, но в безналичном вполне себе)</li>
+</ul>
+<p>В целом если нам нужен небольшой скрипт, чтобы посчитать с возможными огрехами какую-то сумму в одной валюте - можно вообще не запариваться (ну или практически) за типы и взять стандартные</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">money_sum</span>(money1: int <span style="color:#f92672">|</span> float <span style="color:#f92672">|</span> Decimal, money2: int <span style="color:#f92672">|</span> float <span style="color:#f92672">|</span> Decimal) <span style="color:#f92672">-&gt;</span> int <span style="color:#f92672">|</span> float <span style="color:#f92672">|</span> Decimal:
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;&#34;&#34;Получаем сумму денег. Функция ничего не проверяет, 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	так что вся валидация должна быть снаружи. Молимся, что это одна 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	и та же валюта
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	:param int money1: Деньга 1
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	:param int money2: Деньга 2
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	:return int: Сумма денег
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> money1 <span style="color:#f92672">+</span> money2
+</span></span></code></pre></div><p>Если приложение будет больше, можно в теории нарваться на совсем какую-нибудь дичь.  Например, у нас баланс пользователя передавался в неименованном кортеже и мы случайно взяли его id вместо суммы. Но это конечно грязные додумки, такого не бывает в приличном обществе.</p>
+<h4 id="следующий-уровень----отдельный-общий-тип">Следующий уровень  - отдельный общий тип<a hidden class="anchor" aria-hidden="true" href="#следующий-уровень----отдельный-общий-тип">#</a></h4>
+<p>На этом уровне мы моделируем наш тип. Это может быть что-то вроде:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Money</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, currency: str, value: Decimal <span style="color:#f92672">|</span> int <span style="color:#f92672">|</span> str):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>currency <span style="color:#f92672">=</span> currency
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> isinstance(value, Decimal):
+</span></span><span style="display:flex;"><span>            self<span style="color:#f92672">.</span>value <span style="color:#f92672">=</span> value
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">elif</span> isinstance(value, (int, str)):
+</span></span><span style="display:flex;"><span>            self<span style="color:#f92672">.</span>value <span style="color:#f92672">=</span> Decimal(value)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">to_dict</span>(self) <span style="color:#f92672">-&gt;</span> dict[str, str]:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;currency&#34;</span>: self<span style="color:#f92672">.</span>currency,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;value&#34;</span>: str(self<span style="color:#f92672">.</span>value),
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __eq__(self, other: Any) <span style="color:#f92672">-&gt;</span> bool:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> isinstance(other, Money):
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>currency <span style="color:#f92672">==</span> other<span style="color:#f92672">.</span>currency <span style="color:#f92672">and</span> self<span style="color:#f92672">.</span>value <span style="color:#f92672">==</span> other<span style="color:#f92672">.</span>value
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __add__(self, other: Any) <span style="color:#f92672">-&gt;</span> <span style="color:#e6db74">&#34;Money&#34;</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> other <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">or</span> other <span style="color:#f92672">is</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> Money(currency<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>currency, value<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>value)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> isinstance(other, Money):
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>currency <span style="color:#f92672">!=</span> other<span style="color:#f92672">.</span>currency:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">TypeError</span>(<span style="color:#e6db74">&#34;Cannot add money of different currencies&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> Money(currency<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>currency, value<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>value <span style="color:#f92672">+</span> other<span style="color:#f92672">.</span>value)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">TypeError</span>(<span style="color:#e6db74">&#34;You can&#39;t add Money to another type </span><span style="color:#e6db74">%s</span><span style="color:#e6db74">&#34;</span>, other)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ну и там дальше остальные методы допустимых операций</span>
+</span></span></code></pre></div><p>Это дает нам возможнсть определить список допустимых операций над типом, ввести дополнительные ограничения (мы не можем складывать разные валюты) и уже  подключать анализатор, использовать этот тип в аннотациях:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">money_sum</span>(money1: Money, money2: Money) <span style="color:#f92672">-&gt;</span> Money:
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;&#34;&#34;Получаем сумму денег. 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	:param Money money1: Деньга 1
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	:param Money money2: Деньга 2
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	:return Money: Сумма денег
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> money1 <span style="color:#f92672">+</span> money2
+</span></span><span style="display:flex;"><span>	
+</span></span></code></pre></div><p>Теперь мы застрахованы ещё до запуска приложения от того, что например передадим какой-то случайный <code>int</code> в операцию. А в рантайме мы даже защищены от неожиданного сложения разных валют. Хотя и будем неприятно падать.</p>
+<p>Но с плюшками приходят и дополнительные проблемы:</p>
+<ul>
+<li>Нужно больше думать на этапе планирования архитектуры. Больше знать о доменной области, ожидаемом поведении. Это увеличивает время разработки.</li>
+<li>Увеличивается количество кода на границах системы. Новые типы нужно спарсить, провалидировать а потом сериализовать и сохранить.</li>
+<li>Могут быть проблемы совместимости со сторонними библиотеками.</li>
+</ul>
+<h4 id="больше-строгости---тип-для-каждой-валюты">Больше строгости - тип для каждой валюты<a hidden class="anchor" aria-hidden="true" href="#больше-строгости---тип-для-каждой-валюты">#</a></h4>
+<p>Тут я задался вопросом, а можно ли в целом в питоне просчитать всё на этапе статической проверки типов?</p>
+<p>Получилось как-то так:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TypedMoney</span>(Generic[LiteralCur]):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    Типизированный вариант Money, где валюта фиксирована (через Literal).
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    В потомках нужно определить:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        currency: Literal[&#34;USD&#34;] = &#34;USD&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    или другую подходящую строку. Это позволит mypy проверить,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    что нельзя складывать/вычитать разные валюты.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    Примеры конкретных валют:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    class USD(TypedMoney[Literal[&#34;USD&#34;]]):
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        currency: Literal[&#34;USD&#34;] = &#34;USD&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    class RUB(TypedMoney[Literal[&#34;RUB&#34;]]):
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        currency: Literal[&#34;RUB&#34;] = &#34;RUB&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    currency: LiteralCur
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, value: Decimal <span style="color:#f92672">|</span> int <span style="color:#f92672">|</span> str):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>_money <span style="color:#f92672">=</span> Money(self<span style="color:#f92672">.</span>currency, value)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">to_dict</span>(self) <span style="color:#f92672">-&gt;</span> dict[str, str]:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>_money<span style="color:#f92672">.</span>to_dict()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">unwrap</span>(self) <span style="color:#f92672">-&gt;</span> Money:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> Money(self<span style="color:#f92672">.</span>currency, self<span style="color:#f92672">.</span>_money<span style="color:#f92672">.</span>value)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __eq__(self, other: object) <span style="color:#f92672">-&gt;</span> bool:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> isinstance(other, TypedMoney):
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>_money <span style="color:#f92672">==</span> other<span style="color:#f92672">.</span>_money
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __add__(
+</span></span><span style="display:flex;"><span>        self: <span style="color:#e6db74">&#34;TypedMoney[LiteralCur]&#34;</span>, other: <span style="color:#e6db74">&#34;TypedMoney[LiteralCur]&#34;</span> <span style="color:#f92672">|</span> Literal[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>    ) <span style="color:#f92672">-&gt;</span> <span style="color:#e6db74">&#34;TypedMoney[LiteralCur]&#34;</span>:
+</span></span><span style="display:flex;"><span>        other_value <span style="color:#f92672">=</span> other<span style="color:#f92672">.</span>unwrap() <span style="color:#66d9ef">if</span> isinstance(other, TypedMoney) <span style="color:#66d9ef">else</span> other
+</span></span><span style="display:flex;"><span>        raw_result <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>_money<span style="color:#f92672">.</span>__add__(other_value)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>__class__(raw_result<span style="color:#f92672">.</span>value)
+</span></span></code></pre></div><p>способ дискуссионный, но это в первую очередь синтетический пример, чтобы получить возможность отлавливать сложение на этапе проверки.</p>
+<p>После этого мы можем определять классы отдельных валют</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">USD</span>(TypedMoney[Literal[<span style="color:#e6db74">&#34;USD&#34;</span>]]):
+</span></span><span style="display:flex;"><span>    currency: Literal[<span style="color:#e6db74">&#34;USD&#34;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;USD&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RUB</span>(TypedMoney[Literal[<span style="color:#e6db74">&#34;RUB&#34;</span>]]):
+</span></span><span style="display:flex;"><span>    currency: Literal[<span style="color:#e6db74">&#34;RUB&#34;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;RUB&#34;</span>
+</span></span></code></pre></div><p>И уже на них mypy будет предупреждать нас о некорректных операциях ещё на этапе статической проверки:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>usd <span style="color:#f92672">=</span> USD(<span style="color:#ae81ff">4</span>)
+</span></span><span style="display:flex;"><span>rub <span style="color:#f92672">=</span> RUB(<span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>total <span style="color:#f92672">=</span> usd <span style="color:#f92672">+</span> rub  
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># error: Unsupported operand types for + (&#34;USD&#34; and &#34;RUB&#34;)  [operator]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">money_sum</span>(money1: TypedMoney[LiteralCur], money2: TypedMoney[LiteralCur]) <span style="color:#f92672">-&gt;</span> TypedMoney[LiteralCur]:
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;&#34;&#34;Получаем сумму денег. 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	:param Money money1: Деньга 1
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	:param Money money2: Деньга 2
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	:return Money: Сумма денег
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">	&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> money1 <span style="color:#f92672">+</span> money2
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(money_sum(usd, rub))
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># error: Cannot infer type argument 1 of &#34;money_sum&#34;  [misc]</span>
+</span></span></code></pre></div><p>Но это приводит нас к ещё большим ограничениям:</p>
+<ul>
+<li>Теперь надо знать все валюты до запуска приложения, потому что с динамически определенными классами такая штука уже не сработает</li>
+<li>Нужна дополнительная логика для приведения типов к единому образу</li>
+</ul>
+<h4 id="выводы">Выводы<a hidden class="anchor" aria-hidden="true" href="#выводы">#</a></h4>
+<p>В целом получаем, что за спасение от потенциальных &ldquo;глупых&rdquo; ошибок нужно платить более многословной и строгой системой, требующей качественной проработки на этапе планирования.</p>
+<p>На текущий момент я не знаю проектов, которые бы требовали закрытия типами полностью. Рынок очень агрессивная штука и часто чтобы выжить бизнесу может быть выгоднее выкатывать быстро фичи и потом фиксы чем долго планировать и делать &ldquo;сразу качественно&rdquo; + более долгое планирование к сожалению не всегда равно более качественный код. Нужно будет подключать бизнес экспертов, желательно понимать в какую сторону будет развиваться функционал дальше. В общем комплексная шутка.</p>
+<p>Но меня радует, что есть инструмент позволяющий увеличить уровень формализованности систем создаваемых на Python.</p>
+<p>код с типами выложил <a href="https://github.com/Gexeg/money_type" target="_blank" >сюда</a>
+
+</p>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/blog/tags/python/">Python</a></li>
+      <li><a href="http://localhost:1313/blog/tags/mypy/">Mypy</a></li>
+      <li><a href="http://localhost:1313/blog/tags/types/">Types</a></li>
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/blog/">Контекста не завезли</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

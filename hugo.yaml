@@ -1,0 +1,21 @@
+baseURL: https://gexeg.github.io/blog/
+languageCode: en-us
+title: Контекста не завезли
+theme: ["PaperMod"]
+
+params:
+  # defaultTheme: light
+  # defaultTheme: dark
+  defaultTheme: auto # to switch between dark or light according to browser theme
+
+menu:
+  main:
+    - identifier: "Заметки"
+      name: "Заметки"
+      url: "/notes/"
+      weight: 1
+
+    - identifier: "Автор"
+      name: "Автор"
+      url: "/about/"
+      weight: 2
