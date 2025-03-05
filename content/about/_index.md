@@ -12,7 +12,7 @@ draft: "false"
 
 [Telegram канал](https://t.me/need_moar_context)
 
-[Rss feed](/index.xml)
+[Rss feed](index.xml)
 
 ### **Контакты:**
 [Гитхаб](https://github.com/Gexeg)
